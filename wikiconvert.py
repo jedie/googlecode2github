@@ -126,6 +126,8 @@ def convert_file(proj_id, src_path, dst_dir):
         codecs.open(dst_path, 'w', 'utf-8').write(text)
         log("wrote '%s'" % dst_path)
 
+    return gh_page_name, dst_path
+
 
 #---- internal support stuff
 

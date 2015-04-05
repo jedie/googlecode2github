@@ -37,13 +37,17 @@ def convert_dir(proj_id, src_dir, dst_dir):
 
 
 def wiki2creole(proj_id, src_path, dst_dir):
+    log("\nConvert %r..." % src_path)
+
     gh_page_name, md_file_path = wiki2markdown(proj_id, src_path, dst_dir)
-    log("Convert %r to html..." % md_file_path)
 
     with codecs.open(md_file_path, 'r', 'utf-8') as f:
         md_content = f.read()
 
     html = markdown.markdown(md_content)
+    html=html.replace("<pre><code>", "\n<pre>\n")
+    html=html.replace("</code></pre>", "</pre>\n")
+
     creole_content = html2creole(html)
 
     creole_path = os.path.join(dst_dir, gh_page_name+".creole")

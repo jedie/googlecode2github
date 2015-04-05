@@ -30,6 +30,13 @@ def convert_dir(proj_id, src_dir, dst_dir):
         for f in glob(join(src_dir, "*.wiki")):
             convert_file(proj_id, f, dst_dir)
 
+
+def convert_code(m):
+    code = m.group("code")
+    code = "\n".join(["    %s" % line for line in code.splitlines()])
+    return "\n%s\n" % code
+
+
 def convert_file(proj_id, src_path, dst_dir):
     src = codecs.open(src_path, 'r', 'utf-8').read()
     meta_lines = []
@@ -55,8 +62,18 @@ def convert_file(proj_id, src_path, dst_dir):
                   text)
 
     # Code blocks
-    text = re.compile(r'^{{{+ *\n', re.M).sub(r"```\n", text)
-    text = re.compile(r'^}}}+ *(\n|$)', re.M).sub(r"```\n", text)
+    text = re.sub(
+        r'''
+            ^{{{ \s* $
+                (?P<code>
+                    (.|\n)+?
+                )
+            ^}}} \s* $
+        ''',
+        convert_code,
+        text,
+        flags=re.VERBOSE | re.UNICODE | re.MULTILINE
+    )
 
     # Headings.
     text = re.compile(r'^===(.*?)===\s*$', re.M).sub(lambda m: "### %s\n"%m.group(1).strip(), text)
